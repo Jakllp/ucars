@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.core.config.yaml.YamlConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -1309,14 +1308,25 @@ public class uCarsListener implements Listener {
 				theNewLoc.add(0, 1.5d, 0);
 				Boolean calculated = false;
 				double y = 1.05;
+				if(ucars.plugin.getServer().getPluginManager().isPluginEnabled("SmoothMinecarts")) {
+					y = 1.1;
+				}
 				
 				if(block.getType().name().toLowerCase().contains("slab")) {
 					calculated = true;
 					
-					if(((Slab) block.getBlockData()).getType() == Slab.Type.BOTTOM) {
-						y = 0.5;
+					if(ucars.plugin.getServer().getPluginManager().isPluginEnabled("SmoothMinecarts")) {
+						if(((Slab) block.getBlockData()).getType() == Slab.Type.BOTTOM) {
+							y = 0.6;
+						} else {
+							y = 1.2;
+						}
 					} else {
-						y = 1.002;
+						if(((Slab) block.getBlockData()).getType() == Slab.Type.BOTTOM) {
+							y = 0.5;
+						} else {
+							y = 1.002;
+						}
 					}
 				} else if(block.getType().name().toLowerCase().contains("carpet")) {
 					calculated = true;
