@@ -1,8 +1,8 @@
 name: uCars
 main: com.useful.ucars.ucars
-version: 23.1
+version: v1.1EXP
 api-version: 1.13
-softdepend: [Vault]
+softdepend: [Vault,SmoothMinecarts]
 depend: [ProtocolLib]
 commands:
    ucars:

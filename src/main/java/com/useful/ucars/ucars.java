@@ -63,6 +63,7 @@ public class ucars extends JavaPlugin {
 	public static boolean playersIgnoreTrafficLights = false;
 	public static boolean turningCircles = true;
 	public static boolean fireUpdateEvent = false;
+	public static boolean smooth = false;
 
 	public static String colorise(String prefix) {
 		return ChatColor.translateAlternateColorCodes('&', prefix);
@@ -609,6 +610,9 @@ public class ucars extends JavaPlugin {
 						"Error registering command " + k.toString());
 				e.printStackTrace();
 			}
+		}
+		if (getServer().getPluginManager().getPlugin("SmoothMinecarts") != null) {
+			this.smooth = true;
 		}
 		if (getServer().getPluginManager().getPlugin("ProtocolLib") != null) {
 			Boolean success = setupProtocol();
