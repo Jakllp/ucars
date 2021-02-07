@@ -19,7 +19,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Lightable;
-import org.bukkit.block.data.type.Slab;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -67,6 +66,10 @@ public class uCarsListener implements Listener {
 	private ucars plugin;
 	private List<String> ignoreJump = null;
 	
+	private static double GRAVITY_Y_VELOCITY_MAGNITUDE = 0.04;
+	private static double SIMULATED_FRICTION_SPEED_MULTIPLIER = 0.55;
+	private static double SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER = 0.925;
+	
 	private Boolean carsEnabled = true;
 	private Boolean licenseEnabled = false;
 	private Boolean roadBlocksEnabled = false;
@@ -109,10 +112,13 @@ public class uCarsListener implements Listener {
 	public Vector calculateCarStats(Entity car, Player player,
 			Vector velocity, double currentMult) {
 		if (UEntityMeta.hasMetadata(car, "car.frozen") || car.hasMetadata("car.frozen")) {
-			velocity = new Vector(0, velocity.getY(), 0);
+			if(car.hasMetadata("inertialYAxis")) {
+				velocity = new Vector(0, velocity.getY(), 0); // Don't freeze Y-velocity
+			}
+			velocity = new Vector(0, GRAVITY_Y_VELOCITY_MAGNITUDE, 0);
 			return velocity;
 		}
-		velocity = plugin.getAPI().getTravelVector(car, velocity, currentMult);
+		velocity = plugin.getAPI().getTravelVector(car, velocity, currentMult);		
 		return velocity;
 	}
 
@@ -643,7 +649,6 @@ public class uCarsListener implements Listener {
 			return;
 		}
 		/*// Attempt pre-protocollib controls (Broken in MC 1.6.0 and probably above)
-
 		Vector playerVelocity = car.getPassenger().getVelocity();
 		ucarUpdateEvent ucarupdate = new ucarUpdateEvent(car,
 				playerVelocity, player, CarDirection.NONE);
@@ -1193,37 +1198,21 @@ public class uCarsListener implements Listener {
 				 (!ignoreJump.contains(bType.name().toUpperCase()) && cont && modY)) { //Should jump
 /*			player.sendMessage("Obstruction ahead");
 			player.sendMessage("above: "+bidU);*/
+			boolean calculated = false;
 			if (bidU == Material.AIR || bidU == Material.LAVA 
 					|| bidU == Material.LEGACY_STATIONARY_LAVA || bidU == Material.WATER
 					|| bidU == Material.LEGACY_STATIONARY_WATER /*|| bidU == Material.STEP */
 					|| bidU == Material.LEGACY_CARPET
 					/*|| bidU == Material.DOUBLE_STEP*/ || inStairs) { //Clear air above
 				theNewLoc.add(0, 1.5d, 0);
-				Boolean calculated = false;
-				double y = 1.05;
-				if(ucars.smooth) {
-					y = 1.1;
-				}
-				
-				if(block.getType().name().toLowerCase().contains("slab")) {
+				double y = 0.0;
+				if(block.getBoundingBox().getMaxY() != car.getLocation().getBlock().getBoundingBox().getMaxY()) { //Check if we're staying on the same level (slabs, carpet etc -> no need to climb if not)
 					calculated = true;
-					
 					if(ucars.smooth) {
-						if(((Slab) block.getBlockData()).getType() == Slab.Type.BOTTOM) {
-							y = 0.6;
-						} else {
-							y = 1.2;
-						}
+						y = block.getBoundingBox().getMaxY()-block.getLocation().getBlockY() + 0.3;
 					} else {
-						if(((Slab) block.getBlockData()).getType() == Slab.Type.BOTTOM) {
-							y = 0.5;
-						} else {
-							y = 1.002;
-						}
+						y = block.getBoundingBox().getMaxY()-block.getLocation().getBlockY() + 0.2;
 					}
-				} else if(block.getType().name().toLowerCase().contains("carpet")) {
-					calculated = true;
-					y = 0.2;
 				}
 				
 				if (carBlock.name().toLowerCase()
@@ -1259,10 +1248,15 @@ public class uCarsListener implements Listener {
 				travel.setY(0.1); // Make a little easier
 				UEntityMeta.setMetadata(car, "car.ascending", new StatValue(null, plugin));
 			}
-			// Move the car and adjust vector to fit car stats
-			if(car.getLocation().getY() != car.getLocation().getBlockY()) {
-				travel.multiply(new Vector(0.65,1,0.65));
+			// Account for speed increase when climbing
+			if(calculated) {
+				if(ucars.smooth) {
+					travel.multiply(new Vector(SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER,1,SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER));
+				} else {
+					travel.multiply(new Vector(SIMULATED_FRICTION_SPEED_MULTIPLIER,1,SIMULATED_FRICTION_SPEED_MULTIPLIER));
+				}
 			}
+			// Move the car and adjust vector to fit car stats
 			car.setVelocity(calculateCarStats(car, player, travel,
 					multiplier));
 		} else {
@@ -1271,11 +1265,15 @@ public class uCarsListener implements Listener {
 				travel.setY(0.1); // Make a little easier
 				UEntityMeta.setMetadata(car, "car.ascending", new StatValue(null, plugin));
 			}
-			// Move the car and adjust vector to fit car stats
-			if(car.getLocation().getY() != car.getLocation().getBlockY()) {
-				travel.multiply(new Vector(0.65,1,0.65));
+			// Account for speed increase when going down
+			if(car.getFallDistance() > 0.0) {
+				if(ucars.smooth) {
+					travel.multiply(new Vector(SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER,1,SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER));
+				} else {
+					travel.multiply(new Vector(SIMULATED_FRICTION_SPEED_MULTIPLIER,1,SIMULATED_FRICTION_SPEED_MULTIPLIER));
+				}
 			}
-			
+			// Move the car and adjust vector to fit car stats
 			car.setVelocity(calculateCarStats(car, player, travel,
 					multiplier));
 		}
@@ -2120,7 +2118,8 @@ public class uCarsListener implements Listener {
 		ignoreJump.add(Material.BIRCH_FENCE_GATE.name());
 		ignoreJump.add(Material.JUNGLE_FENCE.name());
 		ignoreJump.add(Material.JUNGLE_FENCE_GATE.name());
-		
+		/*ignoreJump.add("CARPET"); // carpet
+*/		
 		usePerms = ucars.config.getBoolean("general.permissions.enable");
 		carsEnabled = ucars.config.getBoolean("general.cars.enable");
 		defaultHealth = ucars.config.getDouble("general.cars.health.default");
