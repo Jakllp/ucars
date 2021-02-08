@@ -1209,7 +1209,7 @@ public class uCarsListener implements Listener {
 				if(block.getBoundingBox().getMaxY() != car.getLocation().getBlock().getBoundingBox().getMaxY()) { //Check if we're staying on the same level (slabs, carpet etc -> no need to climb if not)
 					calculated = true;
 					if(ucars.smooth) {
-						y = block.getBoundingBox().getMaxY()-block.getLocation().getBlockY() + 0.3;
+						y = block.getBoundingBox().getMaxY()-block.getLocation().getBlockY() + 0.35;
 					} else {
 						y = block.getBoundingBox().getMaxY()-block.getLocation().getBlockY() + 0.2;
 					}
@@ -1249,7 +1249,7 @@ public class uCarsListener implements Listener {
 				UEntityMeta.setMetadata(car, "car.ascending", new StatValue(null, plugin));
 			}
 			// Account for speed increase when climbing
-			if(calculated) {
+			if(calculated && car.getType() == EntityType.MINECART) {
 				if(ucars.smooth) {
 					travel.multiply(new Vector(SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER,1,SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER));
 				} else {
@@ -1266,7 +1266,7 @@ public class uCarsListener implements Listener {
 				UEntityMeta.setMetadata(car, "car.ascending", new StatValue(null, plugin));
 			}
 			// Account for speed increase when going down
-			if(car.getFallDistance() > 0.0) {
+			if(car.getFallDistance() > 0.0 && car.getType() == EntityType.MINECART) {
 				if(ucars.smooth) {
 					travel.multiply(new Vector(SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER,1,SMOOTH_SIMULATED_FRICTION_SPEED_MULTIPLIER));
 				} else {
