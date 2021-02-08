@@ -111,12 +111,13 @@ public class uCarsListener implements Listener {
 	 */
 	public Vector calculateCarStats(Entity car, Player player,
 			Vector velocity, double currentMult) {
-		if (UEntityMeta.hasMetadata(car, "car.frozen") || car.hasMetadata("car.frozen")) {
-			if(car.hasMetadata("inertialYAxis")) {
-				velocity = new Vector(0, velocity.getY(), 0); // Don't freeze Y-velocity
-			}
+		if(car.hasMetadata("inertialYAxis")) {
+			velocity = new Vector(0, velocity.getY(), 0); // Don't freeze Y-velocity
+		}
+		if(car.getType() == EntityType.MINECART) {
 			velocity = new Vector(0, GRAVITY_Y_VELOCITY_MAGNITUDE, 0);
-			return velocity;
+		} else {
+			velocity = new Vector(0, 0, 0);
 		}
 		velocity = plugin.getAPI().getTravelVector(car, velocity, currentMult);		
 		return velocity;
