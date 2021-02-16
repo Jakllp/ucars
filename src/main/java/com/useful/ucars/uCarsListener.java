@@ -111,13 +111,18 @@ public class uCarsListener implements Listener {
 	 */
 	public Vector calculateCarStats(Entity car, Player player,
 			Vector velocity, double currentMult) {
-		if(car.hasMetadata("inertialYAxis")) {
-			velocity = new Vector(0, velocity.getY(), 0); // Don't freeze Y-velocity
-		}
-		if(car.getType() == EntityType.MINECART) {
-			velocity = new Vector(0, GRAVITY_Y_VELOCITY_MAGNITUDE, 0);
-		} else {
-			velocity = new Vector(0, 0, 0);
+		if (UEntityMeta.hasMetadata(car, "car.frozen") || car.hasMetadata("car.frozen")) {
+			if(car.hasMetadata("car.inertialYAxis")) {
+				velocity = new Vector(0, velocity.getY(), 0); // Don't freeze Y-velocity
+				return velocity;
+			}
+			
+			if(car.getType() == EntityType.MINECART && !ucars.smooth) {
+				velocity = new Vector(0, GRAVITY_Y_VELOCITY_MAGNITUDE, 0);
+			} else {
+				velocity = new Vector(0, 0, 0);
+			}
+			return velocity;
 		}
 		velocity = plugin.getAPI().getTravelVector(car, velocity, currentMult);		
 		return velocity;
@@ -785,10 +790,6 @@ public class uCarsListener implements Listener {
 															// fixes
 															// controls for
 															// 1.6
-		
-		if(car.hasMetadata("car.inertialYAxis")) {
-			travel.setY(event.getVehicle().getVelocity().getY());
-		}
 			
 		float a = 1;
 		if(ucars.smoothDrive){ //If acceleration is enabled
@@ -1297,7 +1298,7 @@ public class uCarsListener implements Listener {
 		Player p = (Player) event.getEntity();
 		if (inACar(p.getName())) {
 			Vector vel = p.getVehicle().getVelocity();
-			if (!(vel.getY() > -0.1 && vel.getY() < 0.1)) {
+			if (!(vel.getY() > -0.1 && vel.getY() < 0.1) || (ucars.smooth && !(vel.getY() > -0.01 && vel.getY() < 0.01))) {
 				event.setCancelled(true);
 			} /*else {
 				try {
@@ -1306,7 +1307,7 @@ public class uCarsListener implements Listener {
 					// Damaging failed
 				}
 			}*/
-
+			
 		}
 		return;
 	}

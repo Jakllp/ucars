@@ -156,7 +156,6 @@ public class MotionManager {
 		//player.sendMessage(""+ControlInput.getCurrentAccel(player)+" "+ControlInput.getCurrentDriveDir(player));
 		
 		long timeSinceOnGround = System.currentTimeMillis() - ControlInput.getFirstAirTime(player);
-		
 		double y = -0.1 + (-0.003*timeSinceOnGround); // rough gravity of minecraft
 		if(y < -1){
 			y = -1;
