@@ -621,7 +621,8 @@ public class ucars extends JavaPlugin {
 				e.printStackTrace();
 			}
 		}
-		if (getServer().getPluginManager().getPlugin("SmoothMinecarts") != null) {
+		if (getServer().getPluginManager().getPlugin("SmoothMinecarts") != null || getServer().getPluginManager().getPlugin("TrainCartsLite") != null) {
+			Bukkit.getConsoleSender().sendMessage("We are SMOOTH");
 			this.smooth = true;
 		}
 		if (getServer().getPluginManager().getPlugin("ProtocolLib") != null) {

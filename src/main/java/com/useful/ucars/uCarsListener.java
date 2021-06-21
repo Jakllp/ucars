@@ -54,6 +54,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.useful.uCarsAPI.CarRespawnReason;
 import com.useful.uCarsAPI.uCarCrashEvent;
 import com.useful.uCarsAPI.uCarRespawnEvent;
@@ -252,6 +254,49 @@ public class uCarsListener implements Listener {
 		return true;
 	}
 
+	public boolean isACar(CommonEntity<?> cart) {
+		Location loc = cart.getLocation();
+		Block b = loc.getBlock();
+		loc.setY(loc.getY() - 1);
+		Block underblock = loc.getBlock();
+		String mat = b.getType().name().toUpperCase();
+		String underMat = b.getRelative(BlockFace.DOWN).getType().name().toUpperCase();
+		String underUnderMat = b.getRelative(BlockFace.DOWN, 2).getType().name().toUpperCase();
+
+		List<String> checks = new ArrayList<String>();
+		if(ucars.ignoreRails){
+			checks.add("POWERED_RAIL");
+			checks.add("RAIL");
+			checks.add("RAILS");
+			checks.add("DETECTOR_RAIL");
+			checks.add("ACTIVATOR_RAIL");
+
+			List<String> newRoadBlocks = new ArrayList<>(roadBlocks);
+			newRoadBlocks.remove("AIR");								//Keeping the metadata when falling off a cliff after rails
+			if(cart.hasMetadata("car.wasOnRails") && cart.getVelocity().getY() == 0
+					&& (plugin.isBlockEqualToConfigIds(newRoadBlocks, underblock) ||
+							!ucars.config.getBoolean("general.cars.roadBlocks.enable") && cart.getVelocity().getX() == 0 && cart.getVelocity().getZ() == 0)
+					&& !checks.contains(mat) ) {
+				cart.removeMetadata("car.wasOnRails",plugin);
+			}
+			if(cart.hasMetadata("car.wasOnRails")) {
+				return false;
+			}
+		}
+		if(checks.contains(mat)
+				|| checks.contains(underMat)
+				|| checks.contains(underUnderMat)){
+			cart.setMetadata("car.wasOnRails", new StatValue(true, ucars.plugin));
+			Bukkit.getConsoleSender().sendMessage(""+((CommonMinecart<?>)cart).getMaxSpeed());
+			if(((CommonMinecart<?>)cart).getMaxSpeed() != 0.01) {
+				((CommonMinecart<?>)cart).setMaxSpeed(0.01);
+				Bukkit.getConsoleSender().sendMessage("Even better");
+			}
+			return false;
+		}
+		return true;
+	}
+
 	/*
 	 * Resets any boosts the given car may have
 	 */
@@ -335,7 +380,11 @@ public class uCarsListener implements Listener {
 				}
 			}
 			Vehicle cart = (Vehicle) ent;
-			return isACar(cart);
+			if(!ucars.smooth) {
+				return isACar(cart);
+			} else {
+				return isACar(CommonEntity.get(cart));
+			}
 		} catch (Exception e) {
 			// Server reloading
 			return false;
@@ -366,8 +415,14 @@ public class uCarsListener implements Listener {
 				|| UEntityMeta.hasMetadata(event.getVehicle(), "safeExit.ignore")){
 			return;
 		}
-		if(!(event.getVehicle() instanceof Vehicle) || !isACar((Vehicle) event.getVehicle())){
-			return;
+		if(!ucars.smooth) {
+			if(!(event.getVehicle() instanceof Vehicle) || !isACar((Vehicle) event.getVehicle())){
+				return;
+			}
+		} else {
+			if(!(event.getVehicle() instanceof Vehicle) || !isACar(CommonEntity.get(event.getVehicle()))){
+				return;
+			}
 		}
 	}
 
@@ -504,9 +559,14 @@ public class uCarsListener implements Listener {
 		}
 
 		Vehicle car = (Vehicle) vehicle;
-
-		if (!isACar(car)) {
-			return;
+		if(!ucars.smooth) {
+			if (!isACar(car)) {
+				return;
+			}
+		} else {
+			if (!isACar(CommonEntity.get(car))) {
+				return;
+			}
 		}
 
 		Vector vel = car.getVelocity();
@@ -717,8 +777,14 @@ public class uCarsListener implements Listener {
 
 		Vehicle car = (Vehicle) vehicle;
 
-		if(!isACar(car)){
-			return;
+		if(!ucars.smooth) {
+			if (!isACar(car)) {
+				return;
+			}
+		} else {
+			if (!isACar(CommonEntity.get(car))) {
+				return;
+			}
 		}
 
 		if (!(player.isInsideVehicle())) {
@@ -745,8 +811,15 @@ public class uCarsListener implements Listener {
 			}
 			UEntityMeta.removeMetadata(car, "car.jumping");
 		}
-		if(car instanceof Minecart && ((Minecart) car).getMaxSpeed() != 5) {
-			((Minecart)car).setMaxSpeed(5); // Don't allow game breaking speed - but faster than default
+
+
+		if(car instanceof Minecart) { // Don't allow game breaking speed - but faster than default
+			((Minecart)car).setMaxSpeed(5);
+		}
+		CommonEntity<?> preCommonCar = CommonEntity.get(car);
+		if(preCommonCar instanceof CommonMinecart) {
+			CommonMinecart<?> CommonCar = (CommonMinecart<?>) preCommonCar;
+			CommonCar.setMaxSpeed(5);
 		}
 
 		// Calculate road blocks
@@ -1121,11 +1194,9 @@ public class uCarsListener implements Listener {
 								}
 							}
 							car.eject();
-
 							UUID carId = car.getUniqueId();
 
-							final Location toTele = new Location(s.getWorld(), x,
-									y, z);
+							final Location toTele = new Location(s.getWorld(), x, y, z);
 							Chunk ch = toTele.getChunk();
 							if (!ch.isLoaded()) {
 								ch.load(true);
@@ -1320,8 +1391,14 @@ public class uCarsListener implements Listener {
 			return;
 		}
 		final Vehicle cart = (Vehicle) veh;
-		if (!isACar(cart)) {
-			return;
+		if(!ucars.smooth) {
+			if (!isACar(cart)) {
+				return;
+			}
+		} else {
+			if (!isACar(CommonEntity.get(cart))) {
+				return;
+			}
 		}
 		Entity ent = event.getEntity(); //copCar
 		if(((cart.hasMetadata("trade.npc") && ent.hasMetadata("trade.npcvillager"))
@@ -1720,8 +1797,14 @@ public class uCarsListener implements Listener {
 		}
 		final Vehicle car = (Vehicle) event.getVehicle();
 		Player player = (Player) event.getAttacker();
-		if (!isACar(car)) {
-			return;
+		if(!ucars.smooth) {
+			if (!isACar(car)) {
+				return;
+			}
+		} else {
+			if (!isACar(CommonEntity.get(car))) {
+				return;
+			}
 		}
 		if (!ucars.config.getBoolean("general.cars.health.overrideDefault")) {
 			return;
