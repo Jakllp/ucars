@@ -33,12 +33,15 @@ public class PlaceManager {
 	}
 	
 	public static Boolean placeableOn(Block block, ucars plugin) {
+		if(ucars.listener.isMultiverse() && !ucars.listener.getWorldList().contains(block.getWorld().getName())) {
+			return false;
+		}
+		
 		if (!ucars.config.getBoolean("general.cars.roadBlocks.enable")) {
 			return true;
 		}
-		List<String> rBlocks = ucars.config
-				.getStringList("general.cars.roadBlocks.ids");
 		
+		List<String> rBlocks = ucars.config.getStringList("general.cars.roadBlocks.ids");
 		return plugin.isBlockEqualToConfigIds(rBlocks,block);
 	}
 }
