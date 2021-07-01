@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -170,6 +171,11 @@ public class ucars extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
+		
+		//bStats
+		int pluginId = 11901; // <-- Replace with the id of your plugin!
+        Metrics metrics = new Metrics(this, pluginId);
+		
 		File langFile = new File(getDataFolder().getAbsolutePath()
 				+ File.separator + "lang.yml");
 		if (langFile.exists() == false || langFile.length() < 1) {

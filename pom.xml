@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.useful</groupId>
-  <artifactId>ucars</artifactId>
+  <artifactId>ucars-bStats</artifactId>
   <name>ucars</name>
   <url>https://github.com/storm345dev/ucars/</url>
   <issueManagement>
@@ -33,7 +33,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
+          <artifactId>maven-shade-plugin</artifactId>
     		  <version>3.1.0</version>
     		  <configuration>
             <show>public</show>
@@ -42,6 +42,28 @@
       	  	</excludePackageNames>
             <stylesheetfile>https://dl.dropboxusercontent.com/u/50672767/ucars/doc/stylesheet.css</stylesheetfile>
           </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+              <configuration>
+                <artifactSet>
+                  <includes>
+                    <include>org.bstats</include>
+                  </includes>
+                </artifactSet>
+                <minimizeJar>true</minimizeJar>
+                <relocations>
+                  <relocation>
+                    <pattern>org.bstats</pattern>
+                    <shadedPattern>net.stormdev.mario.metrics</shadedPattern>
+                  </relocation>
+                </relocations>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <!--<plugin>
           <artifactId>maven-assembly-plugin</artifactId>
@@ -115,6 +137,12 @@
             <artifactId>bukkit</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.bstats</groupId>
+        <artifactId>bstats-bukkit</artifactId>
+        <version>2.2.1</version>
+        <scope>compile</scope>
       </dependency>
     </dependencies>
     <distributionManagement>
