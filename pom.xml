@@ -76,7 +76,7 @@
       </repository>
       <repository>
         <id>protocollib-rep</id>
-	        <name>Dmulloy repo</name>
+	      <name>Dmulloy repo</name>
         <url>https://repo.dmulloy2.net/nexus/repository/public/</url>
       </repository>
 	    <repository>
@@ -110,17 +110,6 @@
         <version>1.13.2-R0.1-SNAPSHOT</version>
         <scope>provided</scope>
       </dependency>
-      <!--<dependency>
-        <groupId>com.bergerkiller.bukkit</groupId>
-        <artifactId>TrainCarts</artifactId>
-        <version>1.16.5-v1</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.github.Jakllp</groupId>
-        <artifactId>TrainCartsLite</artifactId>
-        <version>LATEST</version>
-      </dependency> -->
       <dependency>
         <groupId>com.github.MilkBowl</groupId>
         <artifactId>VaultAPI</artifactId>
@@ -142,7 +131,7 @@
       </repository>
     </distributionManagement>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-  <version>0.5-EXP</version>
+  <version>0.5.1-EXP</version>
 </project>
