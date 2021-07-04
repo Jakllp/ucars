@@ -175,7 +175,7 @@ public class ucars extends JavaPlugin {
 
 		//bStats
 		int pluginId = 11901; // <-- Replace with the id of your plugin!
-    Metrics metrics = new Metrics(this, pluginId);
+		Metrics metrics = new Metrics(this, pluginId);
 
 		version = Float.valueOf(Bukkit.getVersion().replace(")","").split("MC: 1.")[1]);
 
