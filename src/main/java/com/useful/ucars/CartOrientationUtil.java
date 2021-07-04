@@ -37,11 +37,20 @@ public class CartOrientationUtil {
 		try {
 			Class<?> cmr = cart.getClass();
 			Method getHandle = cmr.getMethod("getHandle");
-			Class<?> ema = Reflect.getNMSClass("EntityMinecartAbstract");
+			Class<?> ema = Reflect.getNMSClass("world.entity.vehicle.","EntityMinecartAbstract");
 			Object nmsCart = getHandle.invoke(cmr.cast(cart));
-			Field p = ema.getField("pitch");
-			p.setAccessible(true);
-			p.set(ema.cast(nmsCart), -pitch);
+			Field p = null;
+			if(ucars.version < 17) {
+				p = ema.getField("pitch");
+				p.setAccessible(true);
+				p.set(ema.cast(nmsCart), -pitch);
+				p.setAccessible(false);
+			} else {
+				/*p = ema.getField("y");
+				p.setAccessible(true);
+				p.set(ema.cast(nmsCart), -pitch);	/TODO Fix this for 1.17 - WHAT FIELD IS IT?
+				p.setAccessible(false); */
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -58,11 +67,20 @@ public class CartOrientationUtil {
 		try {
 			Class<?> cmr = cart.getClass();
 			Method getHandle = cmr.getMethod("getHandle");
-			Class<?> ema = Reflect.getNMSClass("EntityMinecartAbstract");
+			Class<?> ema = Reflect.getNMSClass("world.entity.vehicle.","EntityMinecartAbstract");
 			Object nmsCart = getHandle.invoke(cmr.cast(cart));
-			Field p = ema.getField("yaw");
-			p.setAccessible(true);
-			p.set(ema.cast(nmsCart), yaw);
+			Field p = null;
+			if(ucars.version < 17) {
+				p = ema.getField("yaw");
+				p.setAccessible(true);
+				p.set(ema.cast(nmsCart), yaw);
+				p.setAccessible(false);
+			} else {
+				p = ema.getField("ay");				//For other entities this seems to be y (according to some forum threads) but... it's ay here.
+				p.setAccessible(true);
+				p.set(ema.cast(nmsCart), yaw);
+				p.setAccessible(false);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

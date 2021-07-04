@@ -64,6 +64,7 @@ public class ucars extends JavaPlugin {
 	public static boolean playersIgnoreTrafficLights = false;
 	public static boolean turningCircles = true;
 	public static boolean fireUpdateEvent = false;
+	public static Float version = null;
 
 	public static String colorise(String prefix) {
 		return ChatColor.translateAlternateColorCodes('&', prefix);
@@ -142,7 +143,7 @@ public class ucars extends JavaPlugin {
 			 * PacketAdapter(plugin, ConnectionSide.CLIENT_SIDE,
 			 * ListenerPriority.NORMAL, 0x1b) {
 			 */
-			
+
 			((ProtocolManager) this.protocolManager).addPacketListener(
 					  new PacketAdapter(this, PacketType.Play.Client.STEER_VEHICLE) {
 						  @Override
@@ -159,7 +160,7 @@ public class ucars extends JavaPlugin {
 												sideways, jumping);
 										return;
 									}});
-								
+
 						  }
 					});
 		} catch (Exception e) {
@@ -171,11 +172,13 @@ public class ucars extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
-		
+
 		//bStats
 		int pluginId = 11901; // <-- Replace with the id of your plugin!
-        Metrics metrics = new Metrics(this, pluginId);
-		
+    Metrics metrics = new Metrics(this, pluginId);
+
+		version = Float.valueOf(Bukkit.getVersion().replace(")","").split("MC: 1.")[1]);
+
 		File langFile = new File(getDataFolder().getAbsolutePath()
 				+ File.separator + "lang.yml");
 		if (langFile.exists() == false || langFile.length() < 1) {
@@ -647,7 +650,7 @@ public class ucars extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(listener, this);
 		this.API = new uCarsAPI();
 		smoothDrive = config.getBoolean("general.cars.smooth");
-		
+
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable(){
 
 			@Override
@@ -665,7 +668,7 @@ public class ucars extends JavaPlugin {
 				}
 				return;
 			}}, 20*20l, 120*20l);
-		
+
 		getLogger().info("uCars has been enabled!");
 		return;
 	}
@@ -717,7 +720,7 @@ public class ucars extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 	public final Boolean isItemEqualToConfigIds(List<String> rawIds, ItemStack item) {
 		// split by : then compare!
 		for (String raw : rawIds) {
@@ -770,7 +773,7 @@ public class ucars extends JavaPlugin {
 	public Boolean isPluginHooked(Plugin plugin) {
 		return getAPI().isPluginHooked(plugin);
 	}
-	
+
 	public Plugin getPlugin(String name){
 		try {
 			for(Plugin p:this.hookedPlugins){
