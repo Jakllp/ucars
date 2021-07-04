@@ -37,19 +37,20 @@ public class CartOrientationUtil {
 		try {
 			Class<?> cmr = cart.getClass();
 			Method getHandle = cmr.getMethod("getHandle");
-			Class<?> ema = Reflect.getNMSClass("world.entity.vehicle.","EntityMinecartAbstract");
 			Object nmsCart = getHandle.invoke(cmr.cast(cart));
 			Field p = null;
 			if(ucars.version < 17) {
+				Class<?> ema = Reflect.getNMSClass("world.entity.vehicle.","EntityMinecartAbstract");
 				p = ema.getField("pitch");
 				p.setAccessible(true);
 				p.set(ema.cast(nmsCart), -pitch);
 				p.setAccessible(false);
 			} else {
-				/*p = ema.getField("y");
+				Class<?> e = Reflect.getNMSClass("world.entity.","Entity");
+				p = e.getDeclaredField("az");		//So... They decided that the pitch is now in the entity-class and protected/private or smth. Yeah. Frickin Mojang/Microsoft or whatever
 				p.setAccessible(true);
-				p.set(ema.cast(nmsCart), -pitch);	/TODO Fix this for 1.17 - WHAT FIELD IS IT?
-				p.setAccessible(false); */
+				p.set(e.cast(nmsCart), -pitch);
+				p.setAccessible(false);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
