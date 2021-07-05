@@ -10,10 +10,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class Reflect {
-	
+
 	public static String version;
 	public static boolean newProtocol;
-	
+
 	static {
 		String name = Bukkit.getServer().getClass().getPackage().getName();
 		String mcVersion = name.substring(name.lastIndexOf('.') + 1);
@@ -25,7 +25,7 @@ public class Reflect {
 
 		version = mcVersion + ".";
 	}
-	
+
 	// Reflection Util
 	public static void sendPacket(Player p, Object packet) {
 			try {
@@ -46,15 +46,17 @@ public class Reflect {
 				e.printStackTrace();
 			}
 	}
-	
+
 	public static Class<?> getNMSClass(String newPackage, String ClassName) {
 		String className = "net.minecraft.";
-		if(ucars.MCVersion < 17) {
-			className += "server."+ version + ClassName;
-		} else {
-			className += newPackage+ClassName;
+		if(ucars.MCVersion.get(0) == 1) {
+			if(ucars.MCVersion.get(1) < 17) {
+				className += "server."+ version + ClassName;
+			} else {
+				className += newPackage+ClassName;
+			}
 		}
-		
+
 		Class<?> c = null;
 		try {
 			c = Class.forName(className);
@@ -63,7 +65,7 @@ public class Reflect {
 		}
 		return c;
 	}
-	
+
 	public static Class<?> getCBClass(String ClassName) {
 		String className = "org.bukkit.craftbukkit." + version + ClassName;
 		Class<?> c = null;
