@@ -64,7 +64,7 @@ public class ucars extends JavaPlugin {
 	public static boolean turningCircles = true;
 	public static boolean fireUpdateEvent = false;
 	public static boolean smooth = false;
-	public static Float version = null;
+	public static Float MCVersion = null;
 
 	public static String colorise(String prefix) {
 		return ChatColor.translateAlternateColorCodes('&', prefix);
@@ -173,7 +173,7 @@ public class ucars extends JavaPlugin {
 	public void onEnable() {
 		plugin = this;
 
-		version = Float.valueOf(Bukkit.getVersion().replace(")","").split("MC: 1.")[1]);
+		MCVersion = Float.valueOf(Bukkit.getVersion().replace(")","").split("MC: 1.")[1]);
 
 		File langFile = new File(getDataFolder().getAbsolutePath()
 				+ File.separator + "lang.yml");
