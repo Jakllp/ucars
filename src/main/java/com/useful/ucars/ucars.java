@@ -174,6 +174,10 @@ public class ucars extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
+		
+		//bStats
+		int pluginId = 11901; // <-- Replace with the id of your plugin!
+		Metrics metrics = new Metrics(this, pluginId);
 
 		Pattern pattern = Pattern.compile(".v(.*?)_R");		//Get MC-Version
 		Matcher matcher = pattern.matcher(Bukkit.getServer().getClass().getPackage().getName());
