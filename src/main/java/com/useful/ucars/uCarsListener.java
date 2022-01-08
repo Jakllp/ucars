@@ -18,7 +18,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.Lightable;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -1186,21 +1185,22 @@ public class uCarsListener implements Listener {
 		if (UEntityMeta.hasMetadata(car, "car.ascending")) {
 			UEntityMeta.removeMetadata(car, "car.ascending");
 		}
+		Material bType = block.getType();
 		//player.sendMessage(block.getType().name()+" "+faceDir+" "+fx+" "+fz);
 		// Make cars jump if needed
 		if (inStairs ||
-				 (!blockNoJump && !block.isPassable() && cont && modY &&
+				 (!blockNoJump && cont && modY &&
 				 !(softBlocks.contains(block.getType().name()) && softBlocks.contains(carBlockType.name()) ) )) { //Softblocks floating problem
 			//Should jump
 			
 			boolean calculated = false;
-			if (bidU == Material.AIR || bidU == Material.LAVA || bidU == Material.WATER || bidUpLoc.getBlock().isPassable() || noJump(bidU.name()) || inStairs) { //Clear air above
+			if (bidU == Material.AIR || bidU == Material.LAVA || bidU == Material.WATER || noJump(bidUpLoc.getBlock().getType().name()) || noJump(bidU.name()) || inStairs) { //Clear air above
 				theNewLoc.add(0, 1.5d, 0);
 				double y = 0.0;
-				if(block.getBoundingBox().getMaxY() != car.getLocation().getBlock().getBoundingBox().getMaxY() ||
-						(car.getBoundingBox().getMinY() < car.getLocation().getBlock().getBoundingBox().getMaxY() && !inStairs)) { //Check if we're staying on the same level (slabs, carpet etc -> no need to climb if not)
+				if(block.getY() != car.getLocation().getBlock().getY() || //TODO getY will return int for blocks...
+						(car.getLocation().getY() < car.getLocation().getBlock().getY() && !inStairs)) { //Check if we're staying on the same level (slabs, carpet etc -> no need to climb if not)
 					calculated = true;
-					y = block.getBoundingBox().getMaxY()-block.getLocation().getBlockY() + 0.2;
+					y = block.getY()-block.getLocation().getBlockY() + 0.2;
 				}
 				
 				if (carBlockType.name().toLowerCase()
@@ -1505,7 +1505,7 @@ public class uCarsListener implements Listener {
 		if (uCarsAPI.getAPI().isuCarsHandlingPlacingCars() && (plugin.API.hasItemCarCheckCriteria() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.MINECART)) {
 			// Its a minecart!
 			Material iar = block.getType();
-			if (ucars.ignoreRails && (iar == Material.RAIL || iar == Material.ACTIVATOR_RAIL 
+			if (ucars.ignoreRails && (iar == Material.RAILS || iar == Material.ACTIVATOR_RAIL
 					|| iar == Material.POWERED_RAIL || iar == Material.DETECTOR_RAIL)) {
 				return;
 			}
@@ -1762,7 +1762,7 @@ public class uCarsListener implements Listener {
 	@EventHandler
 	void wirelessRedstone(BlockRedstoneEvent event){
 		Block block = event.getBlock();
-		if(!block.getType().equals(Material.REDSTONE_LAMP)){
+		if(!block.getType().equals(Material.REDSTONE_LAMP_ON) || !block.getType().equals(Material.REDSTONE_LAMP_OFF)){
 			return;
 		}
 		boolean on = block.isBlockPowered();
@@ -1866,7 +1866,7 @@ public class uCarsListener implements Listener {
 	@EventHandler
 	void trafficIndicators(BlockRedstoneEvent event){
 		Block block = event.getBlock();
-		if(!block.getType().equals(Material.REDSTONE_LAMP)){
+		if(!block.getType().equals(Material.REDSTONE_LAMP_ON) && !block.getType().equals(Material.REDSTONE_LAMP_OFF)){
 			return;
 		}
 		boolean on = block.isBlockPowered();
@@ -1957,13 +1957,12 @@ public class uCarsListener implements Listener {
 								Location light = new Location(
 										loc.getWorld(), locX, y, locZ);
 								Block lightBlock = light.getBlock();
-								Lightable lightData = (Lightable) lightBlock.getBlockData();
-								if (lightBlock.getType() == Material.REDSTONE_TORCH && !lightData.isLit()) {
+								if (lightBlock.getType() == Material.REDSTONE_LAMP_OFF) {
 									if (trafficlightSignOn(light.getBlock())) {
 										found = true;
 										on = false;
 									}
-								} else if (lightBlock.getType() == Material.REDSTONE_TORCH && lightData.isLit()) {
+								} else if (lightBlock.getType() == Material.REDSTONE_TORCH_ON) {
 									if (trafficlightSignOn(light.getBlock())) {
 										found = true;
 										on = true;
@@ -2072,6 +2071,44 @@ public class uCarsListener implements Listener {
 	
 	public void init() {
 		ignoreJump = new ArrayList<String>();
+		ignoreJump.add("AIR"); //Air
+		ignoreJump.add("LAVA"); //Lava
+		ignoreJump.add("STATIONARY_LAVA"); //Lava
+		ignoreJump.add("WATER"); //Water
+		ignoreJump.add("STATIONARY_WATER"); //Water
+		ignoreJump.add("COBBLE_WALL"); //Cobble wall
+		ignoreJump.add("FENCE"); //fence
+		ignoreJump.add("NETHER_FENCE"); //Nether fence
+		ignoreJump.add("STONE_PLATE"); //Stone pressurepad
+		ignoreJump.add("WOOD_PLATE"); //Wood pressurepad
+		ignoreJump.add("TRIPWIRE"); // tripwires
+		ignoreJump.add("TRIPWIRE_HOOK"); // tripwires
+		ignoreJump.add("TORCH"); // torches
+		ignoreJump.add("REDSTONE_TORCH_ON"); // redstone torches
+		ignoreJump.add("REDSTONE_TORCH_OFF"); // redstone off torches
+		ignoreJump.add("DIODE_BLOCK_OFF"); // repeater off
+		ignoreJump.add("DIODE_BLOCK_ON"); // repeater on
+		ignoreJump.add("REDSTONE_COMPARATOR_OFF"); // comparator off
+		ignoreJump.add("REDSTONE_COMPARATOR_ON"); // comparator on
+		ignoreJump.add("VINE"); // vines
+		ignoreJump.add("LONG_GRASS"); // Tall grass
+		ignoreJump.add("GRASS");
+		ignoreJump.add("STONE_BUTTON"); // stone button
+		ignoreJump.add("WOOD_BUTTON"); // wood button
+		ignoreJump.add("FENCE_GATE"); // fence gate
+		ignoreJump.add("LEVER"); // lever
+		ignoreJump.add("SNOW"); // snow
+		ignoreJump.add("DAYLIGHT_DETECTOR"); // daylight detector
+		ignoreJump.add("SIGN_POST"); // sign
+		ignoreJump.add("WALL_SIGN"); // sign on the side of a block
+		ignoreJump.add(Material.ACACIA_FENCE.name());
+		ignoreJump.add(Material.ACACIA_FENCE_GATE.name());
+		ignoreJump.add(Material.BIRCH_FENCE.name());
+		ignoreJump.add(Material.BIRCH_FENCE_GATE.name());
+		ignoreJump.add(Material.JUNGLE_FENCE.name());
+		ignoreJump.add(Material.JUNGLE_FENCE_GATE.name());
+		//ignoreJump.add("CARPET"); // carpet
+
 		ignoreJump.add("WALL");
 		ignoreJump.add("FENCE");
 		ignoreJump.add("GATE");
