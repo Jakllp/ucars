@@ -1189,12 +1189,15 @@ public class uCarsListener implements Listener {
 		//player.sendMessage(block.getType().name()+" "+faceDir+" "+fx+" "+fz);
 		// Make cars jump if needed
 		if (inStairs ||
-				 (!blockNoJump && cont && modY &&
-				 !(softBlocks.contains(block.getType().name()) && softBlocks.contains(carBlockType.name()) ) )) { //Softblocks floating problem
+				 (!blockNoJump && cont && modY //&&
+				 //!(softBlocks.contains(block.getType().name()) && softBlocks.contains(carBlockType.name()) )
+		)) { //Softblocks floating problem
 			//Should jump
+			Bukkit.getConsoleSender().sendMessage("First Step");
 			
 			boolean calculated = false;
 			if (bidU == Material.AIR || bidU == Material.LAVA || bidU == Material.WATER || noJump(bidUpLoc.getBlock().getType().name()) || noJump(bidU.name()) || inStairs) { //Clear air above
+				Bukkit.getConsoleSender().sendMessage("Second Step");
 				theNewLoc.add(0, 1.5d, 0);
 				double y = 0.0;
 				if(block.getY() != car.getLocation().getBlock().getY() || //TODO getY will return int for blocks...
