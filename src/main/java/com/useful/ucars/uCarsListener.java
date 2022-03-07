@@ -1190,23 +1190,35 @@ public class uCarsListener implements Listener {
 		//player.sendMessage(block.getType().name()+" "+faceDir+" "+fx+" "+fz);
 		// Make cars jump if needed
 		if (inStairs ||
-				 (!blockNoJump && cont && modY //&&
-				 //!(softBlocks.contains(block.getType().name()) && softBlocks.contains(carBlockType.name()) )
-		)) { //Softblocks floating problem
+				 (!blockNoJump && cont && modY)) {
 			//Should jump
-			Bukkit.getConsoleSender().sendMessage("First Step");
-			
 			boolean calculated = false;
-			if (bidU == Material.AIR || bidU == Material.LAVA || bidU == Material.WATER || noJump(bidUpLoc.getBlock().getType().name()) || noJump(bidU.name()) || inStairs) { //Clear air above
-				Bukkit.getConsoleSender().sendMessage("Second Step");
+			if (bidU == Material.AIR || bidU == Material.LAVA || bidU == Material.WATER || noJump(bidU.name()) || inStairs) { //Clear air above
 				theNewLoc.add(0, 1.5d, 0);
 				double y = 0.0;
-				if(block.getY() != car.getLocation().getBlock().getY() || //TODO getY will return int for blocks...
-						(car.getLocation().getY() < car.getLocation().getBlock().getY() && !inStairs)) { //Check if we're staying on the same level (slabs, carpet etc -> no need to climb if not)
-					calculated = true;
-					y = block.getY()-block.getLocation().getBlockY() + 0.2;
+				if(!inStairs) { //I hate this but it works
+					if(!block.getType().name().toUpperCase().contains("STEP") && !block.getType().name().toUpperCase().contains("CARPET")) {
+						calculated = true;
+						y = block.getY()+1 - car.getLocation().getY() + 0.8;
+						if(!(softBlocks.contains(block.getType().name()) && softBlocks.contains(carBlockType.name()))) {
+							y+=0.3;
+						}
+					} else {
+						//SpecialCase: Slab -> slab same level and carpet->carpet
+						if((carBlockType.name().toUpperCase().contains("STEP") && block.getType().name().toUpperCase().contains("STEP") && !block.getType().name().toUpperCase().contains("DOUBLE")) ||
+								(carBlockType.name().toUpperCase().contains("CARPET") && block.getType().name().toUpperCase().contains("CARPET"))) {
+							y = 0;
+						} else if(block.getType().name().toUpperCase().contains("DOUBLE")) { //SpecialCase: Whatever -> Double-Slab
+							y = block.getY()+1 - car.getLocation().getY() + 0.8;
+						} else {
+							y = block.getY() + 1 - car.getLocation().getY();
+							if(block.getType().name().toUpperCase().contains("CARPET")) {
+								y-=0.25;
+							}
+						}
+					}
 				}
-				
+
 				if (carBlockType.name().toLowerCase()
 						.contains(Pattern.quote("stairs"))
 						// ||
@@ -1263,17 +1275,6 @@ public class uCarsListener implements Listener {
 			// Move the car and adjust vector to fit car stats
 			car.setVelocity(calculateCarStats(car, player, travel,
 					multiplier));
-		}
-
-		//Pitch the car
-		if(travel.getY()!=0 && pitchEnabled) {
-			if(travel.getY()<0) {
-				CartOrientationUtil.setPitch(car, (float) (-35*travel.getY()));
-			} else {
-				CartOrientationUtil.setPitch(car, (float) (-20*travel.getY()));
-			}
-		} else {
-			CartOrientationUtil.setPitch(car, 0);
 		}
 
 		// Recalculate car health
@@ -2107,7 +2108,6 @@ public class uCarsListener implements Listener {
 		ignoreJump.add("REDSTONE_COMPARATOR_ON"); // comparator on
 		ignoreJump.add("VINE"); // vines
 		ignoreJump.add("LONG_GRASS"); // Tall grass
-		ignoreJump.add("GRASS");
 		ignoreJump.add("STONE_BUTTON"); // stone button
 		ignoreJump.add("WOOD_BUTTON"); // wood button
 		ignoreJump.add("FENCE_GATE"); // fence gate
@@ -2131,7 +2131,6 @@ public class uCarsListener implements Listener {
 		softBlocks = new ArrayList<String>();
 		softBlocks.add("SNOW");
 		softBlocks.add("SOUL_SAND");
-		softBlocks.add("HONEY_BLOCK");
 		
 		usePerms = ucars.config.getBoolean("general.permissions.enable");
 		carsEnabled = ucars.config.getBoolean("general.cars.enable");
