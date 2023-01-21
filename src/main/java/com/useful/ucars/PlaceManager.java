@@ -22,8 +22,7 @@ public class PlaceManager {
 		if (!ucars.config.getBoolean("general.cars.roadBlocks.enable")) {
 			return true;
 		}
-		List<String> rBlocks = ucars.config
-				.getStringList("general.cars.roadBlocks.ids");
+		List<String> rBlocks = ucars.listener.getRoadBlockList();
 		for (String raw : rBlocks) {
 			if (ItemStackFromId.equals(raw, materialName, data)) {
 				placeable = true; // Placing on a road block
@@ -40,8 +39,8 @@ public class PlaceManager {
 		if (!ucars.config.getBoolean("general.cars.roadBlocks.enable")) {
 			return true;
 		}
-		
-		List<String> rBlocks = ucars.config.getStringList("general.cars.roadBlocks.ids");
+
+		List<String> rBlocks = ucars.listener.getRoadBlockList();
 		return plugin.isBlockEqualToConfigIds(rBlocks,block);
 	}
 }

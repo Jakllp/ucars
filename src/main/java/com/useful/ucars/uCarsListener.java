@@ -1126,9 +1126,10 @@ public class uCarsListener implements Listener {
 							car.eject();
 							
 							UUID carId = car.getUniqueId();
-							
+
+							Location playerLoc = player.getLocation();
 							final Location toTele = new Location(s.getWorld(), x,
-									y, z);
+									y, z, playerLoc.getYaw(), playerLoc.getPitch());
 							Chunk ch = toTele.getChunk();
 							if (!ch.isLoaded()) {
 								ch.load(true);
@@ -2132,6 +2133,7 @@ public class uCarsListener implements Listener {
 			ids.addAll(ucars.config.getStringList("general.cars.HighblockBoost"));
 			ids.addAll(ucars.config.getStringList("general.cars.ResetblockBoost"));
 			ids.addAll(ucars.config.getStringList("general.cars.jumpBlock"));
+			ids.addAll(ucars.config.getStringList("general.cars.speedMods"));
 			ids.add("AIR");
 			ids.add("LAVA");
 			ids.add("STATIONARY_LAVA");
@@ -2178,4 +2180,6 @@ public class uCarsListener implements Listener {
 	public boolean isMultiverse() {
 		return multiverseEnabled;
 	}
+
+	public List<String> getRoadBlockList() { return roadBlocks; }
 }
