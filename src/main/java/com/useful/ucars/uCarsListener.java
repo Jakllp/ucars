@@ -1135,10 +1135,6 @@ public class uCarsListener implements Listener {
 								ch.load(true);
 							}
 							Vehicle newCar = (Vehicle) toTele.getWorld().spawnEntity(toTele,car.getType());
-							if(car instanceof Minecart) {
-								((Minecart)newCar).setDisplayBlockData(((Minecart)car).getDisplayBlockData());
-								((Minecart)newCar).setDisplayBlockOffset(0);
-							}
 							float yaw = player.getLocation().getYaw()+90;
 							if(yaw < 0){
 								yaw = 360 + yaw;
