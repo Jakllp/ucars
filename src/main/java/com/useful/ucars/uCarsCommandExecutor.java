@@ -3,6 +3,7 @@ package com.useful.ucars;
 import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.bukkit.Location;
@@ -335,7 +336,7 @@ public class uCarsCommandExecutor implements CommandExecutor {
 				String notEnough = Lang.get("lang.fuel.notEnoughMoney");
 				notEnough = notEnough.replaceAll("%amount%", "" + value);
 				notEnough = notEnough.replaceAll("%unit%",
-						"" + ucars.economy.currencyNamePlural());
+						"" + Matcher.quoteReplacement(ucars.economy.currencyNamePlural()));
 				notEnough = notEnough.replaceAll("%balance%", "" + bal);
 				sender.sendMessage(ucars.colors.getError() + notEnough);
 				return true;
@@ -349,7 +350,7 @@ public class uCarsCommandExecutor implements CommandExecutor {
 			String success = Lang.get("lang.fuel.success");
 			success = success.replaceAll("%amount%", "" + value);
 			success = success.replaceAll("%unit%",
-					"" + ucars.economy.currencyNamePlural());
+					"" + "" + Matcher.quoteReplacement(ucars.economy.currencyNamePlural()));
 			success = success.replaceAll("%balance%", "" + bal);
 			success = success.replaceAll("%quantity%", "" + amount);
 			sender.sendMessage(ucars.colors.getSuccess() + success);
@@ -392,7 +393,7 @@ public class uCarsCommandExecutor implements CommandExecutor {
 			String success = Lang.get("lang.fuel.sellSuccess");
 			success = success.replaceAll("%amount%", "" + value);
 			success = success.replaceAll("%unit%",
-					"" + ucars.economy.currencyNamePlural());
+					"" + Matcher.quoteReplacement(ucars.economy.currencyNamePlural()));
 			success = success.replaceAll("%balance%", "" + bal);
 			success = success.replaceAll("%quantity%", "" + amount);
 			sender.sendMessage(ucars.colors.getSuccess() + success);
