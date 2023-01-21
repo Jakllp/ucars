@@ -1134,24 +1134,39 @@ public class uCarsListener implements Listener {
 							if (!ch.isLoaded()) {
 								ch.load(true);
 							}
-							player.teleport(toTele.clone().add(0,1,0));
-							uCarRespawnEvent evnt = new uCarRespawnEvent(car, carId, car.getUniqueId(),
+							Vehicle newCar = (Vehicle) toTele.getWorld().spawnEntity(toTele,car.getType());
+							if(car instanceof Minecart) {
+								((Minecart)newCar).setDisplayBlockData(((Minecart)car).getDisplayBlockData());
+								((Minecart)newCar).setDisplayBlockOffset(0);
+							}
+							float yaw = player.getLocation().getYaw()+90;
+							if(yaw < 0){
+								yaw = 360 + yaw;
+							}
+							else if(yaw >= 360){
+								yaw = yaw - 360;
+							}
+							CartOrientationUtil.setYaw(newCar, yaw);
+
+							uCarRespawnEvent evnt = new uCarRespawnEvent(car, carId, newCar.getUniqueId(),
 									CarRespawnReason.TELEPORT);
 							plugin.getServer().getPluginManager().callEvent(evnt);
+							car.remove();
 							if(evnt.isCancelled()){
-								car.remove();
+								newCar.remove();
 							} else{
 								player.sendMessage(ucars.colors.getTp()
 										+ "Teleporting...");
-								final Vehicle ucar = car;
+								player.teleport(toTele.clone().add(0,1,0));
+								newCar.setVelocity(travel);
+
 								Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
 									@Override
 									public void run() {
-										ucar.teleport(toTele);
-										ucar.addPassenger(player); //For the sake of uCarsTrade
+										newCar.addPassenger(player); //For the sake of uCarsTrade
 										return;
 									}}, 2l);
-								car.setVelocity(travel);
+								newCar.setVelocity(travel);
 								if (normalMeta != null) {
 									for (MetadataValue val : normalMeta) {
 										player.setMetadata("car.stayIn", val);
@@ -1163,7 +1178,7 @@ public class uCarsListener implements Listener {
 									}
 								}
 								plugin.getAPI().updateUcarMeta(carId,
-										car.getUniqueId());
+										newCar.getUniqueId());
 							}
 						}
 					}
