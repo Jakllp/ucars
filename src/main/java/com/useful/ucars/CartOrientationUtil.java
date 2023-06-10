@@ -43,7 +43,9 @@ public class CartOrientationUtil {
 			Class <?> ema = Reflect.getNMSClass("world.entity.","Entity");
 
 			if(ucars.MCVersion.get(0) == 1) {
-				if(ucars.MCVersion.get(1) >= 18) {
+				if(ucars.MCVersion.get(1) >= 20) {
+					p = ema.getDeclaredField("aH");
+				} else if(ucars.MCVersion.get(1) >= 18) {
 					p = ema.getDeclaredField("aB");
 				} else if(ucars.MCVersion.get(1) == 17) {
 					p = ema.getDeclaredField("az");
@@ -76,7 +78,9 @@ public class CartOrientationUtil {
 			Field p = null;
 			
 			if(ucars.MCVersion.get(0) == 1) {
-				if(ucars.MCVersion.get(1) >= 18) {
+				if(ucars.MCVersion.get(1) >= 20) {
+					p = ema.getDeclaredField("aG");
+				} else if(ucars.MCVersion.get(1) >= 18) {
 					p = ema.getDeclaredField("aA");
 				} else if(ucars.MCVersion.get(1) == 17) {
 					p = ema.getDeclaredField("ay");
