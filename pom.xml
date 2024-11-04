@@ -118,11 +118,11 @@
       <dependency>
         <groupId>com.comphenix.protocol</groupId>
         <artifactId>ProtocolLib</artifactId>
-        <version>4.5.0</version>
+        <version>5.3.0</version>
       </dependency>
       <dependency>
         <groupId>org.spigotmc</groupId>
-        <artifactId>spigot</artifactId>
+        <artifactId>spigot-api</artifactId>
         <version>1.13.2-R0.1-SNAPSHOT</version>
         <scope>provided</scope>
       </dependency>
@@ -155,5 +155,5 @@
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-  <version>1.20-R1.1.5</version>
+  <version>1.21-R1.1.5</version>
 </project>

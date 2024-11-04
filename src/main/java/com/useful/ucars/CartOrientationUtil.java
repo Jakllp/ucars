@@ -43,8 +43,16 @@ public class CartOrientationUtil {
 			Class <?> ema = Reflect.getNMSClass("world.entity.","Entity");
 
 			if(ucars.MCVersion.get(0) == 1) {
-				if(ucars.MCVersion.get(1) >= 20) {
-					p = ema.getDeclaredField("aH");
+				if(ucars.MCVersion.get(1) >= 21) {
+					if(ucars.MCVersion.get(2) >= 2)
+						p = ema.getDeclaredField("aB");
+					else
+						p = ema.getDeclaredField("aE");
+				} else if(ucars.MCVersion.get(1) >= 20) {
+					if(ucars.MCVersion.get(2) >= 5)
+						p = ema.getDeclaredField("aG");
+					else
+						p = ema.getDeclaredField("aH");
 				} else if(ucars.MCVersion.get(1) >= 18) {
 					p = ema.getDeclaredField("aB");
 				} else if(ucars.MCVersion.get(1) == 17) {
@@ -76,10 +84,18 @@ public class CartOrientationUtil {
 			Class<?> ema = Reflect.getNMSClass("world.entity.","Entity");
 			Object nmsCart = getHandle.invoke(cmr.cast(cart));
 			Field p = null;
-			
+
 			if(ucars.MCVersion.get(0) == 1) {
-				if(ucars.MCVersion.get(1) >= 20) {
-					p = ema.getDeclaredField("aG");
+				if(ucars.MCVersion.get(1) >= 21) {
+					if(ucars.MCVersion.get(2) >= 2)
+						p = ema.getDeclaredField("aA");
+					else
+						p = ema.getDeclaredField("aD");
+				} else if(ucars.MCVersion.get(1) >= 20) {
+					if(ucars.MCVersion.get(2) >= 5)
+						p = ema.getDeclaredField("aF");
+					else
+						p = ema.getDeclaredField("aG");
 				} else if(ucars.MCVersion.get(1) >= 18) {
 					p = ema.getDeclaredField("aA");
 				} else if(ucars.MCVersion.get(1) == 17) {

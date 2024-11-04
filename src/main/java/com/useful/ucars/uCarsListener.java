@@ -504,11 +504,17 @@ public class uCarsListener implements Listener {
 			return;
 		}
 
+		// TODO add motionmanager.move with current intent if Intent exists
+
+		if (MotionManager.MOVE_INTENT != null)
+			MotionManager.move(player);
+
 		Vehicle car = (Vehicle) vehicle;
 		
 		if (!isACar(car)) {
 			return;
 		}
+
 		
 		Vector vel = car.getVelocity();
 		

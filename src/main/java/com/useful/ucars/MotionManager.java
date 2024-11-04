@@ -14,6 +14,8 @@ import com.useful.ucars.util.UEntityMeta;
 import com.useful.ucarsCommon.StatValue;
 
 public class MotionManager {
+
+	public static MoveIntent MOVE_INTENT = null;
 	
 	public static Vector rotateXZVector3dDegrees(Vector original, double degrees){
 		double[] out = rotateVector2dRadians(original.getX(), original.getZ(), Math.toRadians(degrees));
@@ -31,6 +33,12 @@ public class MotionManager {
 	    result[0] = x * Math.cos(radians) - y * Math.sin(radians);
 	    result[1] = x * Math.sin(radians) + y * Math.cos(radians);
 	    return result;
+	}
+
+	public static void move(Player player) {
+		if (MOVE_INTENT == null)
+			return;
+		move(player, MOVE_INTENT.forward, MOVE_INTENT.sideways, MOVE_INTENT.jumping);
 	}
 
 	public static void move(Player player, float f, float s, boolean jumping) { // 'f' and 's' are values taken in by the vehicle control packet		
@@ -265,5 +273,4 @@ public class MotionManager {
 			return;
 		}
 	}
-
 }
